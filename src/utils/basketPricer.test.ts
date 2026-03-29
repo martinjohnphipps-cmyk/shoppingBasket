@@ -83,6 +83,26 @@ describe('basketPricer', () => {
         ).toThrow('Item Unknown Item not found in catalogue');
     });
 
+    it('throws an error when a basket item has a quantity of 0', () => {
+        expect(() =>
+            basketPricer({
+                basket: [{ itemName: 'Baked Beans', quantity: 0 }],
+                catalogue,
+                offers,
+            })
+        ).toThrow('Item quantity must be greater than 0: item Baked Beans has quantity 0');
+    });
+
+    it('throws an error when a basket item has a negative quantity', () => {
+        expect(() =>
+            basketPricer({
+                basket: [{ itemName: 'Baked Beans', quantity: -2 }],
+                catalogue,
+                offers,
+            })
+        ).toThrow('Item quantity must be greater than 0: item Baked Beans has quantity -2');
+    });
+
     it('returns zero subtotal, discount and total for an empty basket', () => {
         const { subtotal, discount, total } = basketPricer({ basket: [], catalogue, offers });
         expect(subtotal).toBe(0);
@@ -131,6 +151,32 @@ describe('basketPricer', () => {
 
         it('calculates the correct total of £11.50', () => {
             expect(total).toBeCloseTo(11.50, 2);
+        });
+    });
+
+    describe('Ratio offer - multiple applications edge cases', () => {
+        it('applies the offer twice for 6 items (6 for price of 4)', () => {
+            const { subtotal, discount, total } = basketPricer({
+                basket: [{ itemName: 'Baked Beans', quantity: 6 }],
+                catalogue,
+                offers,
+            });
+            // 6 × £0.99 = £5.94; 2 free = £1.98 discount
+            expect(subtotal).toBeCloseTo(5.94, 2);
+            expect(discount).toBeCloseTo(1.98, 2);
+            expect(total).toBeCloseTo(3.96, 2);
+        });
+
+        it('applies the offer three times for 9 items (9 for price of 6)', () => {
+            const { subtotal, discount, total } = basketPricer({
+                basket: [{ itemName: 'Baked Beans', quantity: 9 }],
+                catalogue,
+                offers,
+            });
+            // 9 × £0.99 = £8.91; 3 free = £2.97 discount
+            expect(subtotal).toBeCloseTo(8.91, 2);
+            expect(discount).toBeCloseTo(2.97, 2);
+            expect(total).toBeCloseTo(5.94, 2);
         });
     });
 

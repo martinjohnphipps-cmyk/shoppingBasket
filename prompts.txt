@@ -175,3 +175,22 @@ Update prompts.txt as the only file change to include this prompt as per the fil
 
 Then commit and push.
 </prompt>
+
+<prompt id="6" task="analyse code for gaps and produce artifact">
+Checkout main branch of shoppingBasket repository.
+
+Analyse how the code in the repository compares to the project asks and produce an artifact detailing the gaps found.
+
+Update prompts.txt as the only file change to include this prompt as per the file description, make no other changes for now.
+
+Then commit and push.
+</prompt>
+
+<prompt id="7" task="implement 3 gaps from analysis">
+Implement all 3 of these gaps. Update the prompts.txt file to include the last prompt asking for an artifact and this one.
+
+The 3 gaps identified from the analysis are:
+1. No mutable basket / addItem utility - requirement: "A basket is mutable - that is to say products can be added to it."
+2. No validation for non-positive item quantities - defensive validation to uphold the requirement "Baskets cannot have a negative price", since negative quantities would cause a negative subtotal.
+3. Missing edge case tests for offer multiples - requirement: "Consider edge cases in your testing. For example: three for the price of two offer should also give you six for the price of four and nine for the price of six."
+</prompt>

@@ -28,6 +28,9 @@ export function basketPricer({basket, catalogue, offers}: BasketPricerProps) {
     const applicableBasketOffers: Offer[] = [];
 
     for (const item of basket) {
+        if (item.quantity <= 0) {
+            throw new Error(`Item quantity must be greater than 0: item ${item.itemName} has quantity ${item.quantity}`);
+        }
         const itemPrice = catalogue.get(item.itemName);
         if (itemPrice === undefined) {
             throw new Error(`Item ${item.itemName} not found in catalogue`);
