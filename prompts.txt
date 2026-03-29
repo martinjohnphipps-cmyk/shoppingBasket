@@ -1,0 +1,87 @@
+# List of prompts used in working on this project
+
+This should be a sequential list of prompts used whilst working on this project and will be contained within prompt xml
+tags with elements of id and task, where id is the sequential order of prompts used and task is the summary of the ask
+
+<prompt id="1" task="initial tests">
+Create unit tests using vitest in basketPricer.test.ts to cover the scenarios detailed below to test basketPricer.ts
+
+Import types from item.ts as necessary to achieve this. The catalogue detailed below should be used to populate values of a Map of item names to prices, as detailed in basketPricer.ts.
+
+The offers described below should be used to populate an array of Offer objects as per the documentation for the type in items.ts
+
+```
+Catalogue
+This is an example catalogue, provided as a demonstration. You do not have to use these prices or products in your assignment:
+Baked Beans £0.99
+Biscuits £1.20
+Sardines £1.89
+Shampoo (Small) £2.00
+Shampoo (Medium) £2.50
+Shampoo (Large) £3.50
+
+
+Examples
+Examples of what would be expected for a couple of different baskets.
+The supermarket currently has these offers:
+Baked Beans: buy 2 get 1 free
+Sardines: 25% discount
+
+Basket 1: Baked Beans x 4, Biscuits x 1
+Should give the results:
+sub-total: £5.16
+discount: £0.99
+total: £4.17
+
+Basket 2: Baked Beans x 2, Biscuits x 1, Sardines x 2
+Should give the results:
+sub-total: £6.96
+discount: £0.95
+total: £6.01
+```
+</prompt>
+
+<prompt id="2" task="multi-product ratio offer support">
+We now need to extend the functionality of the basketPricer to cover the below scenario.
+
+I have added documentation on basketPricer to indicate that where an offer applies across multiple product names the cheapest product per application should be given.
+
+As below this should be applied to give the maximum possible discount, so the large shampoos should be calculated as a set of 3 to allow for one large shampoo to be free, leaving 2 smalls and a medium where the small is then free.
+
+Currently we are looping over all offers for a given item in a basket.
+
+We may now want a separate step in the basketPricer function to loop through all applicable offers. Instead of doing this within the for each item of a basket loop just push the applicableOffers for an item to an applicableBasketOffers array of offers, building up what offers are valid for our basket, and then we'll loop through these in a separate subsequent for each step passing all items that exist in our basket that exist in the offer itemNames array to calculateOfferDiscount so we can now handle ratio offers across multiple different named products
+
+```
+The supermarket is keen that the discounts should be applied fairly, so the rule must be interpreted to calculate the maximum possible discount given the set of applicable chosen products. This is complicated by the fact that a user may buy any number of products from the set {X}. Example:
+
+The Supermarket currently has the following offer:
+Buy three, get the cheapest one for free with any of the following:
+Shampoo (Large)
+Shampoo (Medium)
+Shampoo (Small)
+Given that the basket contains:
+Shampoo (Large) * 3
+Shampoo (Medium) x 1
+Shampoo (Small) x 2
+Result should give:
+sub-total: £17.0
+discount: £5.5
+total: £11.5
+The customer has got 1 large and 1 small shampoo for free.
+```
+
+Finally update the prompts.txt file to document the prompts as per the documentation there
+</prompt>
+
+<prompt id="3" task="destructure basketPricer output in tests">
+Update basketPricer.test.ts to destructure the output i.e. const { subtotal, discount, result } = basketPricer, instead of taking it as result, update expect statements to use desctructured const values
+
+Update prompt.txt to add this prompt as per the required formatting rules
+</prompt>
+
+<prompt id="4" task="increase test coverage to over 80%">
+Update basketPricer.test.ts to increase coverage to over 80%, aiming for as high as possible without changing basketPricer.ts
+
+Update prompt.txt to add this prompt as per the required formatting rules
+</prompt>
