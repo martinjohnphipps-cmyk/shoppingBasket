@@ -281,3 +281,27 @@ The existing offer types subsection in readme.md should now be inside the inputs
 
 Update the prompts.txt file with this prompt in a prompt tag
 </prompt>
+
+<prompt id="15" task="recommend deleting vite scaffold files">
+This repository was created by me to achieve the design and development assignment below.
+
+I believe it has now met the requirements, including on the documentation side. Note that handling the mutability of the basket is explicitly out of scope so I have not added functionality to adjust what is in the basket, as this would be up to a consuming product to manage.
+
+[Full assignment specification included in prompt]
+
+I initially generated the code in this repository using create vite app, however as the assignment does not require a web interface I have got the scaffold hanging around.
+
+Would you recommend deleting these files as they are not needed for the assignment and I've been asked not to build a web interface for it?
+
+Update the prompts.txt file with this prompt in a new prompt tag at the bottom of the file following the convention of incrementing id and summarisation of the prompt as the task name
+</prompt>
+
+<prompt id="16" task="remove vite scaffold and React dependencies">
+Follow the above plan to tidy up the repository:
+- Delete scaffold files: src/App.tsx, src/App.css, src/index.css, src/main.tsx, src/assets/, index.html, public/
+- Remove React dependencies from package.json (react, react-dom, @types/react, @types/react-dom, @vitejs/plugin-react, eslint-plugin-react-hooks, eslint-plugin-react-refresh, @testing-library/react, @testing-library/dom)
+- Remove react() plugin from vite.config.ts
+- Update build script from "tsc -b && vite build" to "tsc -b"
+
+Update prompts.txt to now include this prompt also adding it as a new prompt tag at the bottom of the file
+</prompt>
