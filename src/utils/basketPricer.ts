@@ -74,6 +74,13 @@ function calculateSubtotalAndApplicableOffers(basket: BasketItem[], catalogue: M
     }
 }
 
+/**
+ * Calculates the total discount for the basket based on the applicable offers
+ * @param basket - An array of items in the shopping basket, each with a name and quantity
+ * @param catalogue - A map of item names to their non discounted prices
+ * @param applicableBasketOffers - An array of offers that are applicable to the items in the basket
+ * @returns The total discount for the basket
+ */
 function calculateBasketDiscount(basket: BasketItem[], catalogue: Map<string, number>, applicableBasketOffers: Offer[]): number {
     let discount = 0;
     for (const offer of applicableBasketOffers) {
@@ -83,20 +90,36 @@ function calculateBasketDiscount(basket: BasketItem[], catalogue: Map<string, nu
     return discount;
 }
 
-function calculateOfferDiscount(items: BasketItem[], catalogue: Map<string, number>, offer: Offer): number {
+/**
+ * Calculates the discount for a given offer based on the items in the basket that are applicable to the offer,
+ * the catalogue of item prices and the offer details (e.g. offer type, discount value or ratio value)
+ * @param basket - An array of items in the shopping basket, each with a name and quantity
+ * @param catalogue - A map of item names to their non discounted prices
+ * @param offer - An offer that can be applied to the items in the basket
+ * @returns The discount amount for the given offer
+ */
+function calculateOfferDiscount(basket: BasketItem[], catalogue: Map<string, number>, offer: Offer): number {
     switch (offer.offerType) {
         case 'Percentage':
-            return percentageDiscount(items, catalogue, offer);
+            return percentageDiscount(basket, catalogue, offer);
         case 'Numeric':
-            return numericDiscount(items, catalogue, offer);
+            return numericDiscount(basket, catalogue, offer);
         case 'Ratio':
-            return ratioDiscount(items, catalogue, offer);
+            return ratioDiscount(basket, catalogue, offer);
         default:
             throw new Error(`Unknown offer type: ${offer.offerType}`);
     }
 }
 
-function percentageDiscount(items: BasketItem[], catalogue: Map<string, number>, offer: Offer): number {
+/**
+ * Calculates the discount for a given offer of type 'Percentage' based on the items in the basket that are applicable to the offer,
+ * the catalogue of item prices and the offer details (e.g. discount value)
+ * @param basket - An array of items in the shopping basket, each with a name and quantity
+ * @param catalogue - A map of item names to their non discounted prices
+ * @param offer - An offer of type 'Percentage' that can be applied to the items in the basket
+ * @returns The discount amount for the given offer
+ */
+function percentageDiscount(basket: BasketItem[], catalogue: Map<string, number>, offer: Offer): number {
     if (offer.discount === undefined) {
         throw new Error(`Offer of type 'Percentage' must have a discount value`);
     }
@@ -105,14 +128,22 @@ function percentageDiscount(items: BasketItem[], catalogue: Map<string, number>,
                         ` for offer with items ${offer.itemNames.join(', ')}`);
     }
     let offerDiscount = 0;
-    for (const item of items) {
+    for (const item of basket) {
         const itemPrice = catalogue.get(item.itemName)!;
         offerDiscount += Math.round((offer.discount / 100) * itemPrice * item.quantity * 100) / 100;
     }
     return offerDiscount;
 }
 
-function numericDiscount(items: BasketItem[], catalogue: Map<string, number>, offer: Offer): number {
+/**
+ * Calculates the discount for a given offer of type 'Numeric' based on the items in the basket that are applicable to the offer,
+ * the catalogue of item prices and the offer details (e.g. discount value)
+ * @param basket - An array of items in the shopping basket, each with a name and quantity
+ * @param catalogue - A map of item names to their non discounted prices
+ * @param offer - An offer of type 'Numeric' that can be applied to the items in the basket
+ * @returns The discount amount for the given offer
+ */
+function numericDiscount(basket: BasketItem[], catalogue: Map<string, number>, offer: Offer): number {
     if (offer.discount === undefined) {
         throw new Error(`Offer of type 'Numeric' must have a discount value`);
     }
@@ -120,7 +151,7 @@ function numericDiscount(items: BasketItem[], catalogue: Map<string, number>, of
         throw new Error(`Offer of type 'Numeric' must have a non-negative discount value`);
     }
     let offerDiscount = 0;
-    for (const item of items) {
+    for (const item of basket) {
         const itemPrice = catalogue.get(item.itemName)!;
         if (offer.discount > itemPrice) {
             throw new Error(`Offer of type 'Numeric' cannot have a discount value greater than the item price: item ${item.itemName}` +
@@ -131,7 +162,15 @@ function numericDiscount(items: BasketItem[], catalogue: Map<string, number>, of
     return offerDiscount;
 }
 
-function ratioDiscount(items: BasketItem[], catalogue: Map<string, number>, offer: Offer): number {
+/**
+ * Calculates the discount for a given offer of type 'Ratio' based on the items in the basket that are applicable to the offer,
+ * the catalogue of item prices and the offer details (e.g. ratio values)
+ * @param basket - An array of items in the shopping basket, each with a name and quantity
+ * @param catalogue - A map of item names to their non discounted prices
+ * @param offer - An offer of type 'Ratio' that can be applied to the items in the basket
+ * @returns The discount amount for the given offer
+ */
+function ratioDiscount(basket: BasketItem[], catalogue: Map<string, number>, offer: Offer): number {
     if (offer.ratio === undefined) {
         throw new Error(`Offer of type 'Ratio' must have a ratio value`);
     }
@@ -145,7 +184,7 @@ function ratioDiscount(items: BasketItem[], catalogue: Map<string, number>, offe
     // Grouping the most expensive items together maximises the discount by making
     // the cheapest item in each group of `required` as expensive as possible.
     const unitPrices: number[] = [];
-    for (const item of items) {
+    for (const item of basket) {
         const itemPrice = catalogue.get(item.itemName)!;
         for (let i = 0; i < item.quantity; i++) {
             unitPrices.push(itemPrice);
