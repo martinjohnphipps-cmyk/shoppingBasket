@@ -82,6 +82,9 @@ function calculateOfferDiscount(items: BasketItem[], catalogue: Map<string, numb
             if (offer.discount === undefined) {
                 throw new Error(`Offer of type 'Numeric' must have a discount value`);
             }
+            if (offer.discount < 0) {
+                throw new Error(`Offer of type 'Numeric' must have a non-negative discount value`);
+            }
             let offerDiscount = 0;
             for (const item of items) {
                 const itemPrice = catalogue.get(item.itemName)!;

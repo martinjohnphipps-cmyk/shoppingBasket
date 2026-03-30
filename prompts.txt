@@ -261,3 +261,13 @@ Update README.md to have a new section at the bottom detailing when errors are t
 
 Ensure the prompts.txt file is updated to include this new prompt in prompt tags
 </prompt>
+
+<prompt id="13" task="add negative numeric discount guard and update README error handling">
+Add error handling in the numeric calculateOfferDiscount to check that the discount value is not negative.
+
+Update readme.md with this new error handling case, and change the readme.md so that the usage example itself uses a try catch around basketPricer, removing the separate error handling code snippet.
+
+This adds clarity and will hopefully help avoid the function being called without error handling.
+
+Update prompts.txt to include this new prompt in prompt tags.
+</prompt>

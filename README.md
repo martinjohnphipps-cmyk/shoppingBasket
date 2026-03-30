@@ -38,18 +38,23 @@ const offers = [
     { itemNames: ['Sardines'], offerType: 'Percentage', discount: 25 },
 ];
 
-const { subtotal, discount, total } = basketPricer({
-    basket: [
-        { itemName: 'Baked Beans', quantity: 4 },
-        { itemName: 'Biscuits', quantity: 1 },
-    ],
-    catalogue,
-    offers,
-});
+try {
+    const { subtotal, discount, total } = basketPricer({
+        basket: [
+            { itemName: 'Baked Beans', quantity: 4 },
+            { itemName: 'Biscuits', quantity: 1 },
+        ],
+        catalogue,
+        offers,
+    });
 
-console.log(subtotal); // 5.16
-console.log(discount); // 0.99
-console.log(total);    // 4.17
+    console.log(subtotal); // 5.16
+    console.log(discount); // 0.99
+    console.log(total);    // 4.17
+} catch (error) {
+    // Inspect error.message to determine the cause — see Error handling section below
+    console.error('Basket pricing failed:', error.message);
+}
 ```
 
 ### Offer types
@@ -60,17 +65,7 @@ console.log(total);    // 4.17
 | `Numeric`     | Fixed amount off per item. | `discount` |
 ## Error handling
 
-`basketPricer` throws a `Error` in the following situations. Wrap calls in a `try/catch` to handle them gracefully:
-
-```ts
-try {
-    const { subtotal, discount, total } = basketPricer({ basket, catalogue, offers });
-    console.log(subtotal, discount, total);
-} catch (error) {
-    // Inspect error.message to determine the cause
-    console.error('Basket pricing failed:', error.message);
-}
-```
+`basketPricer` throws an `Error` in the situations listed below. As shown in the usage example above, wrap every call in a `try/catch` to handle errors gracefully.
 
 ### Conditions that cause an error to be thrown
 
@@ -81,6 +76,7 @@ try {
 | A `Percentage` offer is missing its `discount` field | `Offer of type 'Percentage' must have a discount value` |
 | A `Percentage` offer `discount` is outside 0–100 | `Offer of type 'Percentage' must have a discount value between 0 and 100` |
 | A `Numeric` offer is missing its `discount` field | `Offer of type 'Numeric' must have a discount value` |
+| A `Numeric` offer `discount` is **negative** | `Offer of type 'Numeric' must have a non-negative discount value` |
 | A `Numeric` offer `discount` exceeds the item price | `Offer of type 'Numeric' cannot have a discount value greater than the item price` |
 | A `Ratio` offer is missing its `ratio` field | `Offer of type 'Ratio' must have a ratio value` |
 | A `Ratio` offer has `required` or `paid` ≤ 0 | `Offer of type 'Ratio' must have a ratio value with required and paid greater than 0` |

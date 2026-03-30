@@ -167,6 +167,16 @@ describe('basketPricer', () => {
                 })
             ).toThrow("Offer of type 'Numeric' cannot have a discount value greater than the item price");
         });
+
+        it('throws when a Numeric offer has a negative discount value', () => {
+            expect(() =>
+                basketPricer({
+                    basket: [{ itemName: 'Biscuits', quantity: 1 }],
+                    catalogue,
+                    offers: [{ itemNames: ['Biscuits'], offerType: 'Numeric', discount: -0.50 }],
+                })
+            ).toThrow("Offer of type 'Numeric' must have a non-negative discount value");
+        });
     });
 
     describe('Percentage offer error cases', () => {
