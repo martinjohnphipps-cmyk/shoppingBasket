@@ -271,3 +271,13 @@ This adds clarity and will hopefully help avoid the function being called withou
 
 Update prompts.txt to include this new prompt in prompt tags.
 </prompt>
+
+<prompt id="14" task="add Inputs section to README">
+Add an Inputs section underneath usage and before error handling in the README.md file, this should detail the format of basket, catalogue and offers expected, linking this to the types that are expected for each.
+
+Reference the types in types/items.ts when doing this, and the documentation of the inputs to the function in basketPricer.ts
+
+The existing offer types subsection in readme.md should now be inside the inputs section under the offers sub section adding detail to the different offer types
+
+Update the prompts.txt file with this prompt in a prompt tag
+</prompt>

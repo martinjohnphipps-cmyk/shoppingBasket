@@ -57,12 +57,47 @@ try {
 }
 ```
 
-### Offer types
+## Inputs
+
+The `basketPricer` function accepts a single object argument with three properties. The types for these inputs are defined in [`src/types/items.ts`](src/types/items.ts).
+
+### Basket
+
+`basket: BasketItem[]`
+
+An array of [`BasketItem`](src/types/items.ts) objects, each describing a product and the quantity of that product in the basket:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `itemName` | `string` | The name of the item. Must exist as a key in the catalogue. |
+| `quantity` | `number` | How many of this item are in the basket. Must be non-negative. A quantity of `0` is silently skipped. |
+
+### Catalogue
+
+`catalogue: Map<string, number>`
+
+A `Map` of item names to their undiscounted unit prices. Every `itemName` referenced in the basket must have a corresponding entry in the catalogue.
+
+### Offers
+
+`offers: Offer[]`
+
+An array of [`Offer`](src/types/items.ts) objects describing the discount rules to apply. Each offer has the following fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `itemNames` | `string[]` | The names of the items this offer applies to. |
+| `offerType` | `'Ratio' \| 'Percentage' \| 'Numeric'` | The type of discount to apply — see offer types below. |
+| `discount` | `number` (optional) | The discount value, used by `Percentage` and `Numeric` offer types. |
+| `ratio` | `{ required: number; paid: number }` (optional) | The ratio value, used by the `Ratio` offer type. |
+
+#### Offer types
 | `offerType`   | Description | Required fields |
 |---------------|-------------|-----------------|
 | `Ratio`       | Buy `required` items, pay for `paid` (cheapest free). Works across multiple products. | `ratio: { required, paid }` |
 | `Percentage`  | Percentage discount off the item price. | `discount` (0–100) |
 | `Numeric`     | Fixed amount off per item. | `discount` |
+
 ## Error handling
 
 `basketPricer` throws an `Error` in the situations listed below. As shown in the usage example above, wrap every call in a `try/catch` to handle errors gracefully.
