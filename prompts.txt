@@ -210,3 +210,54 @@ This is to roll changes back into working copy from last 3 commits as these didn
 
 4. Commit and git force push with lease to origin to update the remote to match your local git checkout of this branch
 </prompt>
+
+<prompt id="9" task="analyse code against project requirements and produce a gaps plan">
+Analyse how the code in the repository compares to the following project asks.
+
+Create a plan listing any gaps between the repository and the assignment requests.
+
+Include in the plan that any updates to the repository should also update prompts.txt as per the file description, so a record of the prompts used is kept.
+
+[Full assignment specification included in prompt - covering basket-pricer design, behaviour requirements including mutable basket, empty basket, negative price guard, offer edge case testing, catalogue/offers separation, and README documentation requirement]
+</prompt>
+
+<prompt id="10" task="implement gaps from plan excluding mutability">
+Implement the above plan, without the suggested mutability changes (gap 3) as the assignment explicitly says "This component is not responsible for maintaining the mutable state of a shopping basket. This repository does not need to add and remove items from a basket."
+
+Mutability of the basket is explicitly out of scope, if the basket were to change then this function should be re-executed by the consuming applications.
+
+Ensure the prompts.txt file is updated with this prompt, and also the previous one asking for the plan.
+
+Gaps implemented:
+1. Gap 1 - Added edge case tests for offer multiples (6-for-4, 9-for-6, and below-threshold) in basketPricer.test.ts
+2. Gap 2 - Added quantity <= 0 validation in basketPricer.ts with corresponding tests
+3. Gap 4 - Expanded README.md with setup, test-run instructions and usage examples
+4. Gap 5 - Added paid >= required guard to Ratio offer validation in basketPricer.ts with corresponding tests
+</prompt>
+
+<prompt id="11" task="handle zero quantity basket items gracefully">
+Change basketPricer error handling to throw if item quantity is strictly less than 0.
+
+Update the for each item of basket loop in basketPricer so that if item.quantity is 0 that the code skips to the next iteration of the loop.
+
+Add a describe test section where there is a basket with explicitly 2 large shampoos, 0 medium and 2 small using the pricing that is already in the basketPricer.test.ts file. Use the buy 3 get the cheapest one free offer we have already used in the file.
+
+Add tests in the describe block that check that:
+- 1 small shampoo is given for free (discount matches price of a small shampoo)
+- The sub total price is just the 2 large shampoos and 2 small (medium not included in calculations due to skipping it as there are 0)
+- The total price is as expected, the sub total of the large and small shampoos take the value of one small one
+
+This will show items of 0 quantity are handled correctly, even when they would be included in offers when they had a positive value.
+
+Also add tests in different describe block(s) to cover when there are percentage and numeric offers on baskets where the item quantity is 0.
+
+We are adding this handling as it is reasonable for a basket to be expected not to throw an error when a quantity of 0 is presented for a basket item.
+
+Finally, ensure the prompts.txt file is updated to include this new prompt in prompt tags
+</prompt>
+
+<prompt id="12" task="add error handling section to README">
+Update README.md to have a new section at the bottom detailing when errors are thrown, include in suggested usage wrapping it in a try catch approach so any errors can be caught
+
+Ensure the prompts.txt file is updated to include this new prompt in prompt tags
+</prompt>
