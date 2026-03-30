@@ -85,3 +85,189 @@ Update basketPricer.test.ts to increase coverage to over 80%, aiming for as high
 
 Update prompt.txt to add this prompt as per the required formatting rules
 </prompt>
+
+<prompt id="5" task="analyse code against project requirements">
+Checkout main branch of shoppingBasket repository.
+
+Analyse how the code in the repository compares to the project asks of the following:
+
+``` 
+Design & Development Assignment
+
+Design and implement a "shopping basket" pricing library for a supermarket.
+The basket-pricer component is responsible for working out which offers are applicable to products. It will apply those offers to work out the discount and therefore the final price. This component is not responsible for maintaining the mutable state of a shopping basket. It does not need to add and remove items from a basket.
+This is to be a component of a much bigger system. It could be used in a number of different ways by other developers, for example in an online-shop or in the supermarket's cash-registers. For this reason, it needs to be designed to be reusable. This assignment requires you to design an interface for the basket-pricer which will be easy for other developers to use and test.
+For any given basket, catalogue and offers, your solution should return the sub-total, discount and total, all accurate to at least two decimal places. Prices can be returned as floating point numbers.
+
+Definitions:
+basket: A collection of goods a customer wishes to buy.
+sub-total: The undiscounted cost of items in a basket.
+discount: The amount of money which must be subtracted from the subtotal in order to calculate the final price of the goods in the basket.
+total: The final price of goods in the basket once the discount has been applied.
+offers: These are pricing rules which under some circumstances may cause one or more items in the basket to be discounted, and consequently change the final price of the basket.
+catalogue: The products currently sold by the supermarket. This component requires that products have a unique name and a price. At minimum, the catalogue maps product names onto non-discounted prices.
+basket-pricer: The component you have been asked to build, which given a basket, catalogue and offers can work out the sub-total, discount and total price of the basket of goods.
+
+Behaviour:
+A basket can contain zero or more products.
+A basket is mutable - that is to say products can be added to it.
+An empty basket has a sub-total, discount and total each of zero.
+Baskets cannot have a negative price.
+The discount and therefore the total price is determined by the contents of the basket, the undiscounted price of the goods and the applicable offers.
+As with all supermarkets, the prices of goods and the offers applicable to those goods may change from day to day and therefore cannot be hard-coded into this component.
+Catalogue and offers are maintained by two different teams. It's possible that there are offers on products which are no longer in the catalogue. It's also possible that there are items in the catalogue with no offers, or multiple offers.
+
+Other considerations:
+We are only interested in the behaviour of the shopping basket pricer component. You do not need to build an API, web-interface, database or any component which adds and removes items from the basket. Try to stay focused on implementing the pricer, and especially the logic which determines which offers are applicable to a particular basket of goods.
+Consider edge cases in your testing. For example: three for the price of two offer should also give you six for the price of four and nine for the price of six.
+You can use 3rd party components if you think it will be helpful, for example in your testing.
+Add your solution to a git repo or share as a zip file. Please provide some documentation that will help us run your submission. You may put your documentation in the readme file.
+You can assume all prices are in £(GBP), no need to consider any other currencies.
+For this exercise, a floating point number is good enough to represent a money value, but if you have a better way to represent money, feel free to use it.
+
+Catalogue
+This is an example catalogue, provided as a demonstration. You do not have to use these prices or products in your assignment:
+Baked Beans £0.99
+Biscuits £1.20
+Sardines £1.89
+Shampoo (Small) £2.00
+Shampoo (Medium) £2.50
+Shampoo (Large) £3.50
+
+
+Examples
+Examples of what would be expected for a couple of different baskets.
+The supermarket currently has these offers:
+Baked Beans: buy 2 get 1 free
+Sardines: 25% discount
+
+Basket 1: Baked Beans x 4, Biscuits x 1
+Should give the results:
+sub-total: £5.16
+discount: £0.99
+total: £4.17
+
+Basket 2: Baked Beans x 2, Biscuits x 1, Sardines x 2
+Should give the results:
+sub-total: £6.96
+discount: £0.95
+total: £6.01
+
+The supermarket is keen that the discounts should be applied fairly, so the rule must be interpreted to calculate the maximum possible discount given the set of applicable chosen products. This is complicated by the fact that a user may buy any number of products from the set {X}. Example:
+
+The Supermarket currently has the following offer:
+Buy three, get the cheapest one for free with any of the following:
+Shampoo (Large)
+Shampoo (Medium)
+Shampoo (Small)
+Given that the basket contains:
+Shampoo (Large) * 3
+Shampoo (Medium) x 1
+Shampoo (Small) x 2
+Result should give:
+sub-total: £17.0
+discount: £5.5
+total: £11.5
+The customer has got 1 large and 1 small shampoo for free.
+```
+
+Update prompts.txt as the only file change to include this prompt as per the file description, make no other changes for now.
+
+Then commit and push.
+</prompt>
+
+<prompt id="6" task="analyse code for gaps and produce artifact">
+Checkout main branch of shoppingBasket repository.
+
+Analyse how the code in the repository compares to the project asks and produce an artifact detailing the gaps found.
+
+Update prompts.txt as the only file change to include this prompt as per the file description, make no other changes for now.
+
+Then commit and push.
+</prompt>
+
+<prompt id="7" task="implement 3 gaps from analysis">
+Implement all 3 of these gaps. Update the prompts.txt file to include the last prompt asking for an artifact and this one.
+
+The 3 gaps identified from the analysis are:
+1. No mutable basket / addItem utility - requirement: "A basket is mutable - that is to say products can be added to it."
+2. No validation for non-positive item quantities - defensive validation to uphold the requirement "Baskets cannot have a negative price", since negative quantities would cause a negative subtotal.
+3. Missing edge case tests for offer multiples - requirement: "Consider edge cases in your testing. For example: three for the price of two offer should also give you six for the price of four and nine for the price of six."
+</prompt>
+
+<prompt id="8" task="rollback commits and clean working copy">
+Checkout copilot/analyze-shopping-basket-code branch.
+
+Follow these steps:
+
+1. git reset --soft HEAD~4
+
+This is to roll changes back into working copy from last 3 commits as these didn't go as planned. 
+
+2. reset/revert all the changes in working copy other than to prompts.txt
+
+3. Update prompts.txt to now also include this prompt as per the file description
+
+4. Commit and git force push with lease to origin to update the remote to match your local git checkout of this branch
+</prompt>
+
+<prompt id="9" task="analyse code against project requirements and produce a gaps plan">
+Analyse how the code in the repository compares to the following project asks.
+
+Create a plan listing any gaps between the repository and the assignment requests.
+
+Include in the plan that any updates to the repository should also update prompts.txt as per the file description, so a record of the prompts used is kept.
+
+[Full assignment specification included in prompt - covering basket-pricer design, behaviour requirements including mutable basket, empty basket, negative price guard, offer edge case testing, catalogue/offers separation, and README documentation requirement]
+</prompt>
+
+<prompt id="10" task="implement gaps from plan excluding mutability">
+Implement the above plan, without the suggested mutability changes (gap 3) as the assignment explicitly says "This component is not responsible for maintaining the mutable state of a shopping basket. This repository does not need to add and remove items from a basket."
+
+Mutability of the basket is explicitly out of scope, if the basket were to change then this function should be re-executed by the consuming applications.
+
+Ensure the prompts.txt file is updated with this prompt, and also the previous one asking for the plan.
+
+Gaps implemented:
+1. Gap 1 - Added edge case tests for offer multiples (6-for-4, 9-for-6, and below-threshold) in basketPricer.test.ts
+2. Gap 2 - Added quantity <= 0 validation in basketPricer.ts with corresponding tests
+3. Gap 4 - Expanded README.md with setup, test-run instructions and usage examples
+4. Gap 5 - Added paid >= required guard to Ratio offer validation in basketPricer.ts with corresponding tests
+</prompt>
+
+<prompt id="11" task="handle zero quantity basket items gracefully">
+Change basketPricer error handling to throw if item quantity is strictly less than 0.
+
+Update the for each item of basket loop in basketPricer so that if item.quantity is 0 that the code skips to the next iteration of the loop.
+
+Add a describe test section where there is a basket with explicitly 2 large shampoos, 0 medium and 2 small using the pricing that is already in the basketPricer.test.ts file. Use the buy 3 get the cheapest one free offer we have already used in the file.
+
+Add tests in the describe block that check that:
+- 1 small shampoo is given for free (discount matches price of a small shampoo)
+- The sub total price is just the 2 large shampoos and 2 small (medium not included in calculations due to skipping it as there are 0)
+- The total price is as expected, the sub total of the large and small shampoos take the value of one small one
+
+This will show items of 0 quantity are handled correctly, even when they would be included in offers when they had a positive value.
+
+Also add tests in different describe block(s) to cover when there are percentage and numeric offers on baskets where the item quantity is 0.
+
+We are adding this handling as it is reasonable for a basket to be expected not to throw an error when a quantity of 0 is presented for a basket item.
+
+Finally, ensure the prompts.txt file is updated to include this new prompt in prompt tags
+</prompt>
+
+<prompt id="12" task="add error handling section to README">
+Update README.md to have a new section at the bottom detailing when errors are thrown, include in suggested usage wrapping it in a try catch approach so any errors can be caught
+
+Ensure the prompts.txt file is updated to include this new prompt in prompt tags
+</prompt>
+
+<prompt id="13" task="add negative numeric discount guard and update README error handling">
+Add error handling in the numeric calculateOfferDiscount to check that the discount value is not negative.
+
+Update readme.md with this new error handling case, and change the readme.md so that the usage example itself uses a try catch around basketPricer, removing the separate error handling code snippet.
+
+This adds clarity and will hopefully help avoid the function being called without error handling.
+
+Update prompts.txt to include this new prompt in prompt tags.
+</prompt>

@@ -167,6 +167,16 @@ describe('basketPricer', () => {
                 })
             ).toThrow("Offer of type 'Numeric' cannot have a discount value greater than the item price");
         });
+
+        it('throws when a Numeric offer has a negative discount value', () => {
+            expect(() =>
+                basketPricer({
+                    basket: [{ itemName: 'Biscuits', quantity: 1 }],
+                    catalogue,
+                    offers: [{ itemNames: ['Biscuits'], offerType: 'Numeric', discount: -0.50 }],
+                })
+            ).toThrow("Offer of type 'Numeric' must have a non-negative discount value");
+        });
     });
 
     describe('Percentage offer error cases', () => {
@@ -232,6 +242,192 @@ describe('basketPricer', () => {
                     offers: [{ itemNames: ['Baked Beans'], offerType: 'Ratio', ratio: { required: 3, paid: 0 } }],
                 })
             ).toThrow("Offer of type 'Ratio' must have a ratio value with required and paid greater than 0");
+        });
+
+        it('throws when a Ratio offer has a paid value equal to required', () => {
+            expect(() =>
+                basketPricer({
+                    basket: [{ itemName: 'Baked Beans', quantity: 3 }],
+                    catalogue,
+                    offers: [{ itemNames: ['Baked Beans'], offerType: 'Ratio', ratio: { required: 3, paid: 3 } }],
+                })
+            ).toThrow("Offer of type 'Ratio' must have a paid value less than required");
+        });
+
+        it('throws when a Ratio offer has a paid value greater than required', () => {
+            expect(() =>
+                basketPricer({
+                    basket: [{ itemName: 'Baked Beans', quantity: 3 }],
+                    catalogue,
+                    offers: [{ itemNames: ['Baked Beans'], offerType: 'Ratio', ratio: { required: 2, paid: 3 } }],
+                })
+            ).toThrow("Offer of type 'Ratio' must have a paid value less than required");
+        });
+    });
+
+    describe('Ratio offer multiples edge cases', () => {
+        const threeForTwoOffer: Offer = {
+            itemNames: ['Baked Beans'],
+            offerType: 'Ratio',
+            ratio: { required: 3, paid: 2 },
+        };
+
+        it('gives six Baked Beans for the price of four (offer applied twice)', () => {
+            const { subtotal, discount, total } = basketPricer({
+                basket: [{ itemName: 'Baked Beans', quantity: 6 }],
+                catalogue,
+                offers: [threeForTwoOffer],
+            });
+            // 6 × £0.99 = £5.94; 2 free × £0.99 = £1.98 discount
+            expect(subtotal).toBeCloseTo(5.94, 2);
+            expect(discount).toBeCloseTo(1.98, 2);
+            expect(total).toBeCloseTo(3.96, 2);
+        });
+
+        it('gives nine Baked Beans for the price of six (offer applied three times)', () => {
+            const { subtotal, discount, total } = basketPricer({
+                basket: [{ itemName: 'Baked Beans', quantity: 9 }],
+                catalogue,
+                offers: [threeForTwoOffer],
+            });
+            // 9 × £0.99 = £8.91; 3 free × £0.99 = £2.97 discount
+            expect(subtotal).toBeCloseTo(8.91, 2);
+            expect(discount).toBeCloseTo(2.97, 2);
+            expect(total).toBeCloseTo(5.94, 2);
+        });
+
+        it('does not apply the offer when fewer than the required quantity are in the basket', () => {
+            const { subtotal, discount, total } = basketPricer({
+                basket: [{ itemName: 'Baked Beans', quantity: 2 }],
+                catalogue,
+                offers: [threeForTwoOffer],
+            });
+            expect(subtotal).toBeCloseTo(1.98, 2);
+            expect(discount).toBe(0);
+            expect(total).toBeCloseTo(1.98, 2);
+        });
+    });
+
+    describe('Basket item quantity validation', () => {
+        it('skips an item with a quantity of zero, returning zero subtotal/discount/total for a basket containing only that item', () => {
+            const { subtotal, discount, total } = basketPricer({
+                basket: [{ itemName: 'Baked Beans', quantity: 0 }],
+                catalogue,
+                offers,
+            });
+            expect(subtotal).toBe(0);
+            expect(discount).toBe(0);
+            expect(total).toBe(0);
+        });
+
+        it('throws when a basket item has a negative quantity', () => {
+            expect(() =>
+                basketPricer({
+                    basket: [{ itemName: 'Baked Beans', quantity: -1 }],
+                    catalogue,
+                    offers,
+                })
+            ).toThrow('Item Baked Beans must have a non-negative quantity');
+        });
+    });
+
+    describe('Ratio offer with a zero-quantity basket item (Shampoo Large x2, Medium x0, Small x2)', () => {
+        const shampooOffer: Offer = {
+            itemNames: ['Shampoo (Large)', 'Shampoo (Medium)', 'Shampoo (Small)'],
+            offerType: 'Ratio',
+            ratio: { required: 3, paid: 2 },
+        };
+
+        const { subtotal, discount, total } = basketPricer({
+            basket: [
+                { itemName: 'Shampoo (Large)', quantity: 2 },
+                { itemName: 'Shampoo (Medium)', quantity: 0 },
+                { itemName: 'Shampoo (Small)', quantity: 2 },
+            ],
+            catalogue,
+            offers: [shampooOffer],
+        });
+
+        it('calculates the correct sub-total excluding the zero-quantity Medium shampoo', () => {
+            // 2×£3.50 + 2×£2.00 = £11.00 (Medium skipped)
+            expect(subtotal).toBeCloseTo(11.00, 2);
+        });
+
+        it('gives one Small shampoo for free (discount equals the price of one Small)', () => {
+            // unitPrices: [3.50, 3.50, 2.00, 2.00]; 1 group of 3 → cheapest = £2.00 free
+            expect(discount).toBeCloseTo(2.00, 2);
+        });
+
+        it('calculates the correct total of £9.00', () => {
+            expect(total).toBeCloseTo(9.00, 2);
+        });
+    });
+
+    describe('Percentage offer with a zero-quantity basket item', () => {
+        it('excludes the zero-quantity item from the subtotal and applies no discount for it', () => {
+            // Sardines x0 skipped; Biscuits x1 has no offer
+            const { subtotal, discount, total } = basketPricer({
+                basket: [
+                    { itemName: 'Sardines', quantity: 0 },
+                    { itemName: 'Biscuits', quantity: 1 },
+                ],
+                catalogue,
+                offers: [{ itemNames: ['Sardines'], offerType: 'Percentage', discount: 25 }],
+            });
+            // Subtotal = £1.20; no Sardines to discount
+            expect(subtotal).toBeCloseTo(1.20, 2);
+            expect(discount).toBe(0);
+            expect(total).toBeCloseTo(1.20, 2);
+        });
+
+        it('still applies the Percentage discount to positive-quantity items when another item in the offer has zero quantity', () => {
+            // Sardines x1 at 25% off + Biscuits x0 skipped
+            const { subtotal, discount, total } = basketPricer({
+                basket: [
+                    { itemName: 'Sardines', quantity: 1 },
+                    { itemName: 'Biscuits', quantity: 0 },
+                ],
+                catalogue,
+                offers: [{ itemNames: ['Sardines'], offerType: 'Percentage', discount: 25 }],
+            });
+            // Subtotal = £1.89; 25% of £1.89 = £0.47
+            expect(subtotal).toBeCloseTo(1.89, 2);
+            expect(discount).toBeCloseTo(0.47, 2);
+            expect(total).toBeCloseTo(1.42, 2);
+        });
+    });
+
+    describe('Numeric offer with a zero-quantity basket item', () => {
+        it('excludes the zero-quantity item from the subtotal and applies no discount for it', () => {
+            // Biscuits x0 skipped; Sardines x1 has no offer
+            const { subtotal, discount, total } = basketPricer({
+                basket: [
+                    { itemName: 'Biscuits', quantity: 0 },
+                    { itemName: 'Sardines', quantity: 1 },
+                ],
+                catalogue,
+                offers: [{ itemNames: ['Biscuits'], offerType: 'Numeric', discount: 0.50 }],
+            });
+            // Subtotal = £1.89; no Biscuits to apply fixed discount to
+            expect(subtotal).toBeCloseTo(1.89, 2);
+            expect(discount).toBe(0);
+            expect(total).toBeCloseTo(1.89, 2);
+        });
+
+        it('still applies the Numeric discount to positive-quantity items when another item in the offer has zero quantity', () => {
+            // Biscuits x2 at £0.50 off each + Sardines x0 skipped
+            const { subtotal, discount, total } = basketPricer({
+                basket: [
+                    { itemName: 'Biscuits', quantity: 2 },
+                    { itemName: 'Sardines', quantity: 0 },
+                ],
+                catalogue,
+                offers: [{ itemNames: ['Biscuits'], offerType: 'Numeric', discount: 0.50 }],
+            });
+            // Subtotal = 2×£1.20 = £2.40; 2×£0.50 = £1.00 discount
+            expect(subtotal).toBeCloseTo(2.40, 2);
+            expect(discount).toBeCloseTo(1.00, 2);
+            expect(total).toBeCloseTo(1.40, 2);
         });
     });
 

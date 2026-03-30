@@ -28,6 +28,12 @@ export function basketPricer({basket, catalogue, offers}: BasketPricerProps) {
     const applicableBasketOffers: Offer[] = [];
 
     for (const item of basket) {
+        if (item.quantity < 0) {
+            throw new Error(`Item ${item.itemName} must have a non-negative quantity`);
+        }
+        if (item.quantity === 0) {
+            continue;
+        }
         const itemPrice = catalogue.get(item.itemName);
         if (itemPrice === undefined) {
             throw new Error(`Item ${item.itemName} not found in catalogue`);
@@ -76,6 +82,9 @@ function calculateOfferDiscount(items: BasketItem[], catalogue: Map<string, numb
             if (offer.discount === undefined) {
                 throw new Error(`Offer of type 'Numeric' must have a discount value`);
             }
+            if (offer.discount < 0) {
+                throw new Error(`Offer of type 'Numeric' must have a non-negative discount value`);
+            }
             let offerDiscount = 0;
             for (const item of items) {
                 const itemPrice = catalogue.get(item.itemName)!;
@@ -92,6 +101,9 @@ function calculateOfferDiscount(items: BasketItem[], catalogue: Map<string, numb
             }
             if (offer.ratio.required <= 0 || offer.ratio.paid <= 0) {
                 throw new Error(`Offer of type 'Ratio' must have a ratio value with required and paid greater than 0`);
+            }
+            if (offer.ratio.paid >= offer.ratio.required) {
+                throw new Error(`Offer of type 'Ratio' must have a paid value less than required`);
             }
             // Expand all applicable items into individual unit prices and sort descending.
             // Grouping the most expensive items together maximises the discount by making
